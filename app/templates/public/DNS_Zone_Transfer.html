@@ -1,0 +1,100 @@
+{% extends "public/templates/public_template.html" %}
+
+{% block title %}Guestbook{% endblock %}
+
+{% block main %}
+
+<div class="container">
+  <div class="row">
+    <div class="col">
+
+      <h1>DNS Zone Transfer</h1>
+      <hr>
+
+      <div class="mb-3">
+        <div class="form-group">
+          <label>Domain</label>
+          <input type="text" class="form-control" id="target_in" placeholder="Your name">
+        </div>
+
+        <div class="form-group">
+            <input type="hidden" class="form-control" id="tools_id" value="104">
+          </div>
+
+        <button class="btn btn-primary" id="submit" onclick="submit_message();">Submit message</button>
+      </div>
+
+      <h3>Output</h3>
+      <hr>
+      
+      <div class="mb-3" id="messages">
+        <pre id="successAlert" style="display:none;"></pre>
+        
+        <div id="errorAlert" class="alert alert-danger" role="alert" style="display:none;"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+
+{% block script %}
+
+<script>
+
+  function submit_message() {
+
+    var target_in = document.getElementById("target_in");
+    var tools_id = document.getElementById("tools_id");
+
+    var entry = {
+       target_in: target_in.value,
+      tools_id: tools_id.value
+    };
+
+    fetch(`${window.origin}/guestbook/create-entry`, {
+      method: "POST",
+      credentials: "include",
+      body: JSON.stringify(entry),
+      cache: "no-cache",
+      headers: new Headers({
+        "content-type": "application/json"
+      })
+    })
+      .then(function (response) {
+        if (response.status !== 200) {
+            response.json().then(function (error) {
+            $('#errorAlert').text(error.message).show();
+            $('#successAlert').hide();
+        });
+        }
+        response.json().then(function (data) {
+          if (data.target_in === "Unknow tools_id"){
+            $('#errorAlert').text(data.target_in).show();
+            $('#successAlert').hide();
+          }
+          else if (data.target_in === "Target URL is not accessible. Please try a different hostnames, IP addresses and URL"){
+            $('#errorAlert').text(data.target_in).show();
+            $('#successAlert').hide();
+          }
+          else if (data.target_in === "The target type is invalid. Valid target types are hostnames, IP addresses and URLs"){
+            $('#errorAlert').text(data.target_in).show();
+            $('#successAlert').hide();
+          }
+          else{
+            $('#successAlert').text(data.target_in).show();
+            $('#errorAlert').hide();
+          }
+        });
+      })
+      .catch(function (error) {
+        console.log("Fetch error: " + error.message);
+      });
+
+  }
+
+</script>
+
+{% endblock %}
