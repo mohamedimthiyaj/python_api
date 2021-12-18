@@ -27,7 +27,6 @@ chardet==4.0.0
 charset-normalizer==2.0.9
 click==8.0.3
 click-plugins==1.1.1
-cloud-init==21.4
 cmseek==1.1.3
 colorama==0.4.4
 colorclass==2.2.0
